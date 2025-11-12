@@ -33,7 +33,7 @@ beforeAll(async () => {
     title: 'Test Post',
     content: 'This is a test post content',
     author: userId,
-    category: new mongoose.Types.ObjectId(),
+    category: 'testing',
     slug: 'test-post',
   });
   postId = post._id;
@@ -62,7 +62,7 @@ describe('POST /api/posts', () => {
     const newPost = {
       title: 'New Test Post',
       content: 'This is a new test post content',
-      category: new mongoose.Types.ObjectId().toString(),
+      category: 'testing',
     };
 
     const res = await request(app)
@@ -74,6 +74,7 @@ describe('POST /api/posts', () => {
     expect(res.body).toHaveProperty('_id');
     expect(res.body.title).toBe(newPost.title);
     expect(res.body.content).toBe(newPost.content);
+    expect(res.body.category).toBe('testing');
     expect(res.body.author._id).toBe(userId.toString());
   });
 
@@ -81,7 +82,7 @@ describe('POST /api/posts', () => {
     const newPost = {
       title: 'Unauthorized Post',
       content: 'This should not be created',
-      category: new mongoose.Types.ObjectId().toString(),
+      category: 'testing',
     };
 
     const res = await request(app)
@@ -95,7 +96,7 @@ describe('POST /api/posts', () => {
     const invalidPost = {
       // Missing title
       content: 'This post is missing a title',
-      category: new mongoose.Types.ObjectId().toString(),
+      category: 'testing',
     };
 
     const res = await request(app)
@@ -119,7 +120,7 @@ describe('GET /api/posts', () => {
   });
 
   it('should filter posts by category', async () => {
-    const categoryId = new mongoose.Types.ObjectId().toString();
+    const categoryId = 'testing';
     
     // Create a post with specific category
     await Post.create({
@@ -147,7 +148,7 @@ describe('GET /api/posts', () => {
         title: `Pagination Post ${i}`,
         content: `Content for pagination test ${i}`,
         author: userId,
-        category: new mongoose.Types.ObjectId(),
+        category: `category-${i % 3}`,
         slug: `pagination-post-${i}`,
       });
     }
@@ -244,7 +245,7 @@ describe('DELETE /api/posts/:id', () => {
       title: 'Post to Delete',
       content: 'This post will be deleted',
       author: userId,
-      category: new mongoose.Types.ObjectId(),
+      category: 'ops',
       slug: 'post-to-delete',
     });
 
@@ -266,7 +267,7 @@ describe('DELETE /api/posts/:id', () => {
       title: 'Unauthorized Delete Test',
       content: 'This post should not be deletable',
       author: userId,
-      category: new mongoose.Types.ObjectId(),
+      category: 'ops',
       slug: 'unauthorized-delete',
     });
 
@@ -289,7 +290,7 @@ describe('DELETE /api/posts/:id', () => {
       title: 'Forbidden Delete Test',
       content: 'This post should not be deletable by another user',
       author: userId,
-      category: new mongoose.Types.ObjectId(),
+      category: 'ops',
       slug: 'forbidden-delete',
     });
 

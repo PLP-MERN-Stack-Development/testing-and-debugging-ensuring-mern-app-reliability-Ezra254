@@ -13,6 +13,8 @@ export const useApi = (url, options = {}, immediate = true) => {
   const [loading, setLoading] = useState(immediate);
   const [error, setError] = useState(null);
 
+  const serializedOptions = JSON.stringify(options);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -25,13 +27,13 @@ export const useApi = (url, options = {}, immediate = true) => {
     } finally {
       setLoading(false);
     }
-  }, [url, JSON.stringify(options)]);
+  }, [url, serializedOptions]);
 
   useEffect(() => {
     if (immediate) {
       fetchData();
     }
-  }, [immediate]);
+  }, [immediate, fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 };

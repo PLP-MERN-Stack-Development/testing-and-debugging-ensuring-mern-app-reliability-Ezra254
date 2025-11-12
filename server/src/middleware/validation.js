@@ -57,8 +57,8 @@ const postRules = [
   body('category')
     .notEmpty()
     .withMessage('Category is required')
-    .isMongoId()
-    .withMessage('Invalid category ID'),
+  .isLength({ min: 2, max: 30 })
+  .withMessage('Category must be between 2 and 30 characters'),
 ];
 
 const postUpdateRules = [
@@ -74,8 +74,8 @@ const postUpdateRules = [
     .withMessage('Content must be at least 10 characters'),
   body('category')
     .optional()
-    .isMongoId()
-    .withMessage('Invalid category ID'),
+  .isLength({ min: 2, max: 30 })
+  .withMessage('Category must be between 2 and 30 characters'),
 ];
 
 module.exports = {

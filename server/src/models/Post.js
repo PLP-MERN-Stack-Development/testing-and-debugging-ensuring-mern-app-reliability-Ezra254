@@ -20,9 +20,9 @@ const postSchema = new mongoose.Schema({
     required: true,
   },
   category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
-    required: true,
+    type: String,
+    required: [true, 'Category is required'],
+    trim: true,
   },
   slug: {
     type: String,
@@ -44,7 +44,6 @@ const postSchema = new mongoose.Schema({
 // Index for better query performance
 postSchema.index({ author: 1, createdAt: -1 });
 postSchema.index({ category: 1 });
-postSchema.index({ slug: 1 });
 
 module.exports = mongoose.model('Post', postSchema);
 

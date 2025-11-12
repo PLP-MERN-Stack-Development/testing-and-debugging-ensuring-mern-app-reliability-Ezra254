@@ -61,9 +61,13 @@ const getPost = async (req, res) => {
 const createPost = async (req, res) => {
   try {
     const { title, content, category } = req.body;
-    
+
+    const normalizedTitle = title.trim();
+    const normalizedContent = content.trim();
+    const normalizedCategory = category.trim();
+
     // Generate slug from title
-    const slug = title
+    const slug = normalizedTitle
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
@@ -77,9 +81,9 @@ const createPost = async (req, res) => {
     }
 
     const post = await Post.create({
-      title,
-      content,
-      category,
+      title: normalizedTitle,
+      content: normalizedContent,
+      category: normalizedCategory,
       author: req.user.id,
       slug,
     });
@@ -115,20 +119,25 @@ const updatePost = async (req, res) => {
       });
     }
 
-    const { title, content } = req.body;
+    const { title, content, category } = req.body;
     const updates = {};
 
     if (title) {
-      updates.title = title;
+      const normalizedTitle = title.trim();
+      updates.title = normalizedTitle;
       // Update slug if title changed
-      updates.slug = title
+      updates.slug = normalizedTitle
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
     }
 
     if (content) {
-      updates.content = content;
+      updates.content = content.trim();
+    }
+
+    if (category) {
+      updates.category = category.trim();
     }
 
     const updatedPost = await Post.findByIdAndUpdate(

@@ -1,24 +1,28 @@
 describe('Navigation E2E Tests', () => {
-  it('should navigate between pages', () => {
+  beforeEach(() => {
     cy.visit('/');
-    
-    // Test navigation to different routes
-    // Adjust based on your actual routes
-    cy.get('a[href="/login"]').click();
+  });
+
+  it('shows the home page content', () => {
+    cy.contains('MERN Testing & Reliability Dashboard').should('be.visible');
+    cy.contains('Testing Toolkit').should('be.visible');
+  });
+
+  it('navigates to the login and register pages', () => {
+    cy.contains('Login').click();
     cy.url().should('include', '/login');
-    
-    cy.get('a[href="/"]').click();
-    cy.url().should('not.include', '/login');
+    cy.contains('Sign In').should('be.visible');
+
+    cy.contains('Register').click();
+    cy.url().should('include', '/register');
+    cy.contains('Create Account').should('be.visible');
   });
 
-  it('should maintain navigation state', () => {
-    cy.visit('/');
-    // Add navigation tests specific to your app
-  });
-
-  it('should handle 404 routes gracefully', () => {
+  it('handles 404 routes gracefully', () => {
     cy.visit('/nonexistent-page', { failOnStatusCode: false });
-    // Add assertion for 404 page
+    cy.contains('404 — Page not found').should('be.visible');
+    cy.contains('Back to dashboard').click();
+    cy.url().should('eq', `${window.location.origin}/`);
   });
 });
 

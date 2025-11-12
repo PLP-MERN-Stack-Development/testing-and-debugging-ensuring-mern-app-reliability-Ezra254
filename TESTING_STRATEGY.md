@@ -1,232 +1,137 @@
 # Testing Strategy Documentation
 
 ## Overview
-This document outlines the comprehensive testing strategy implemented for the MERN stack application, covering unit testing, integration testing, end-to-end testing, and debugging techniques.
+This document outlines the comprehensive testing strategy implemented for the MERN stack reliability toolkit, spanning unit, integration, end-to-end testing, and debugging techniques.
 
 ## Testing Framework Setup
 
 ### Task 1: Testing Environment ✅
 
 #### Jest Configuration
-- **Root Configuration**: `jest.config.js` contains multi-project configuration for both client and server
-- **Client Configuration**: Uses `jsdom` environment with Babel transforms for JSX
-- **Server Configuration**: Uses `node` environment
-- **Coverage Thresholds**: Set to 70% for statements, branches, functions, and lines
+- **Root Configuration**: `jest.config.js` orchestrates client and server projects
+- **Client Configuration**: `jsdom` environment with Babel transforms for JSX/ESNext
+- **Server Configuration**: Node environment, MongoMemoryServer for isolation
+- **Coverage Thresholds**: `collectCoverage` enabled globally with 70%+ minimums
 
 #### Testing Utilities
-- **React Testing Library**: Configured for React component testing with `@testing-library/jest-dom` matchers
-- **Supertest**: Configured for API endpoint testing
-- **MongoDB Memory Server**: Used for in-memory database testing (no external MongoDB required)
+- **React Testing Library**: Component/hook assertions with `@testing-library/jest-dom`
+- **Supertest**: HTTP assertions for Express APIs
+- **MongoDB Memory Server**: Ephemeral Mongo instances (no external DB required)
+- **Cypress 13**: Cross-browser E2E automation (Electron headless by default)
 
-#### Test Scripts
-- `npm test` - Run all tests
-- `npm run test:unit` - Run only unit tests
-- `npm run test:integration` - Run only integration tests
-- `npm run test:e2e` - Run end-to-end tests (headless)
-- `npm run test:e2e:open` - Open Cypress test runner
-- `npm run test:coverage` - Generate coverage reports
+#### Test Scripts (root `package.json`)
+- `npm test` – Run entire Jest suite with coverage
+- `npm run test:unit` – Unit suites only (coverage enforced)
+- `npm run test:integration` – API & integration suites (`--coverage=false`)
+- `npm run test:e2e` – Headless Cypress (requires dev servers)
+- `npm run test:e2e:open` – Cypress UI
+- `npm run test:coverage` – Generate coverage reports
+
+Captured CLI output for each suite is stored in `artifacts/` for submission evidence.
 
 ## Unit Testing
 
 ### Task 2: Unit Tests ✅
 
-#### Client-Side Unit Tests
+#### Client-Side Unit Tests (`client/src/tests/unit/`)
+- **Utilities**: `formatDate.test.js`, `validate.test.js`
+- **Hooks**: `useLocalStorage.test.js`, `useApi.test.js`
+- **Components**: `Button.test.jsx`, `LoginForm.test.jsx`, `PostForm.test.jsx`, `ErrorBoundary.test.jsx`
+- **State**: `authReducer.test.js`, `authActions.test.js`
 
-**Utility Functions** (`client/src/utils/`)
-- `formatDate.test.js` - Tests for date formatting functions
-- `validate.test.js` - Tests for email, password, and username validation
-
-**React Components** (`client/src/components/`)
-- `Button.test.jsx` - Comprehensive button component tests (variants, sizes, disabled state)
-- `LoginForm.test.jsx` - Form validation and submission tests
-- `ErrorBoundary.test.jsx` - Error handling and recovery tests
-
-**Custom Hooks** (`client/src/hooks/`)
-- `useLocalStorage.test.js` - LocalStorage hook tests
-- `useApi.test.js` - API hook with loading and error state tests
-
-**Redux** (`client/src/store/`)
-- `authReducer.test.js` - Redux reducer tests (all action types)
-- `authActions.test.js` - Action creator tests
-
-#### Server-Side Unit Tests
-
-**Utility Functions** (`server/src/utils/`)
-- `auth.test.js` - JWT token generation and verification
-- `validators.test.js` - Input validation and sanitization
-
-**Middleware** (`server/src/middleware/`)
-- `middleware.auth.test.js` - Authentication and authorization middleware tests
+#### Server-Side Unit Tests (`server/tests/unit/`)
+- **Utilities**: `auth.test.js`, `validators.test.js`
+- **Middleware**: `middleware.auth.test.js` (authenticate/authorize)
 
 #### Coverage
-All unit tests target 70%+ code coverage. Coverage reports are generated in:
-- `coverage/client/` - Client-side coverage
-- `coverage/server/` - Server-side coverage
+- `npm run test:unit` produces combined coverage; HTML output lives under `coverage/client` and `coverage/server`
+- Current run exceeds 90% statements/lines (see README for summary)
 
 ## Integration Testing
 
 ### Task 3: Integration Tests ✅
 
 #### API Endpoint Tests (`server/tests/integration/`)
+- **auth.test.js** – Register/login/me flows with validation and token checks
+- **posts.test.js** – CRUD operations, authz, filtering, pagination, validation errors
 
-**Authentication** (`auth.test.js`)
-- User registration with validation
-- Login with credentials
-- Protected route access
-- Token verification
+#### React Integration Tests (`client/src/tests/integration/`)
+- **LoginFlow.test.jsx** – Login happy-path + error handling using axios mocks
 
-**Posts API** (`posts.test.js`)
-- CRUD operations for posts
-- Authentication requirements
-- Authorization checks (author-only updates/deletes)
-- Filtering and pagination
-- Input validation
-
-#### React Component Integration Tests (`client/src/tests/integration/`)
-
-**Login Flow** (`LoginFlow.test.jsx`)
-- Complete login flow with API mocking
-- Error handling
-- Success scenarios
-
-#### Database Testing
-- Uses MongoDB Memory Server for isolated test databases
-- Database cleanup between tests
-- Test data setup and teardown
+#### Database Strategy
+- Each test spins up an isolated MongoMemoryServer instance
+- Collections are cleaned between tests to maintain independence
 
 ## End-to-End Testing
 
-### Task 4: E2E Tests ✅
+### Task 4: End-to-End Tests ✅
 
-#### Cypress Setup
-- Configuration: `client/cypress.config.js`
-- Custom commands: `client/cypress/support/commands.js`
-- Base URL: `http://localhost:3000`
+#### Cypress Configuration
+- Located in `client/cypress.config.js`; base URL defaults to `http://localhost:3000`
+- Custom commands in `client/cypress/support/`
+- Execute via `npm run dev` (separate shell) + `npm run test:e2e`
 
 #### Test Suites (`client/cypress/e2e/`)
+- **login.cy.js** – Form rendering, validation, happy/error API flows
+- **navigation.cy.js** – Primary navigation, login/register routing, 404 recovery
+- **posts-crud.cy.js** – Authenticated create/read/update/delete + form validation (API calls intercepted)
 
-**Login Flow** (`login.cy.js`)
-- Form rendering
-- Validation error display
-- Successful login flow
-- API error handling
-
-**Navigation** (`navigation.cy.js`)
-- Route navigation
-- URL changes
-- 404 error handling
-
-**CRUD Operations** (`posts-crud.cy.js`)
-- Create posts
-- Read posts list
-- Update posts
-- Delete posts
-- Form validation
-
-#### Visual Regression
-- Screenshots on failure enabled
-- Custom viewport sizes configured
+Cypress generates screenshots/videos on failure (stored under `client/cypress/screenshots`/`videos`).
 
 ## Debugging Techniques
 
 ### Task 5: Debugging Tools ✅
 
-#### Server-Side Debugging
+#### Server-Side
+- Structured logging (`server/src/utils/logger.js`) with rotating file outputs
+- Global error handler distinguishes validation/JWT/misc errors
+- Performance monitor middleware logs slow requests (>1s)
 
-**Logging Strategy** (`server/src/utils/logger.js`)
-- Console logging with Morgan
-- File logging to `logs/access.log`
-- Error logging to `logs/error.log`
-- Custom error logger with context
+#### Client-Side
+- React error boundary with reset affordance (`client/src/components/ErrorBoundary.jsx`)
+- Custom performance helper for measuring expensive operations (`client/src/utils/performanceMonitor.js`)
+- `useApi` hook centralises error handling/loading state logging
 
-**Global Error Handler** (`server/src/middleware/errorHandler.js`)
-- Centralized error handling
-- Mongoose error handling (CastError, ValidationError)
-- JWT error handling
-- Production-safe error messages
-
-**Performance Monitoring** (`server/src/middleware/performanceMonitor.js`)
-- Request duration tracking
-- Slow request warnings (>1000ms)
-- Database query performance monitoring
-
-#### Client-Side Debugging
-
-**Error Boundaries** (`client/src/components/ErrorBoundary.jsx`)
-- Catches React component errors
-- Displays user-friendly error messages
-- Development mode error details
-- Error recovery mechanism
-
-**Performance Monitoring** (`client/src/utils/performanceMonitor.js`)
-- Function performance measurement
-- Component render time tracking
-- Web Vitals logging
-- Slow render warnings
-
-**Browser Developer Tools**
-- Console logging for debugging
-- React DevTools for component inspection
-- Redux DevTools for state inspection
-
-## Test Execution
-
-### Running Tests Locally
+## Test Execution Summary
 
 ```bash
-# Install dependencies
+# Dependencies
 npm run install-all
 
-# Run all tests
-npm test
+# Development servers
+npm run dev
 
-# Run specific test suites
+# Jest suites
 npm run test:unit
 npm run test:integration
-npm run test:e2e
-
-# Generate coverage reports
 npm run test:coverage
-```
 
-### Test Database Setup
-
-```bash
-# Setup test database (server directory)
-cd server
-npm run setup-test-db
+# Cypress (requires running dev servers)
+npm run test:e2e            # headless
+npm run test:e2e:open       # interactive GUI
 ```
 
 ## Best Practices Implemented
 
-1. **Isolation**: Each test is independent with proper setup/teardown
-2. **Mocking**: External dependencies are properly mocked
-3. **Coverage**: Aiming for 70%+ coverage on critical paths
-4. **Real Database**: Using in-memory MongoDB for realistic integration tests
-5. **Error Scenarios**: Comprehensive error handling tests
-6. **Performance**: Monitoring and optimization tracking
-7. **CI/CD Ready**: All tests can run in CI/CD pipelines
+1. **Isolation** – MongoMemoryServer + per-test cleanup ensures deterministic runs
+2. **Mocking** – Axios/Express responses mocked where appropriate for speed
+3. **Coverage** – 70%+ requirement baked into Jest config
+4. **Artifacts** – Test logs archived in `artifacts/` for grading/reference
+5. **Fail Fast** – Scripts exit non-zero on test failure (except integration coverage)
+6. **Developer Experience** – Scripts documented in README; proxy avoids CORS hassle
 
-## Continuous Improvement
+## Coverage Targets
 
-- Regularly review and update test coverage
-- Add tests for new features before implementation (TDD)
-- Monitor test execution time and optimize slow tests
-- Keep dependencies up to date
-- Review and refactor tests regularly
-
-## Coverage Goals
-
-- **Unit Tests**: 70%+ coverage
-- **Integration Tests**: All API endpoints covered
-- **E2E Tests**: Critical user flows covered
+- Unit (client/server): ≥ 70% statements/lines (current run ~91%)
+- Integration: All endpoints and auth flows covered
+- End-to-End: Login, navigation, and posts CRUD happy/error paths
 
 ## Notes
 
-- Tests run in isolation with proper cleanup
-- No external dependencies required for unit tests
-- Integration tests use in-memory database
-- E2E tests require running application (dev mode)
+- `npm run test:e2e` must run alongside `npm run dev`
+- MongoDB connection string is configurable via `server/.env`
+- Artifacts folder contains the most recent CLI output for unit, integration, and e2e runs
+- Week 6 assignment requirements map directly to sections above; see `Week6-Assignment.md`
 
 
 

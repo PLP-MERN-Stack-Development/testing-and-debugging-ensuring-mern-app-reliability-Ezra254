@@ -1,87 +1,139 @@
-# Testing and Debugging MERN Applications
+# MERN Testing & Reliability Toolkit
 
-This assignment focuses on implementing comprehensive testing strategies for a MERN stack application, including unit testing, integration testing, and end-to-end testing, along with debugging techniques.
+This project is a fully connected MERN (MongoDB, Express, React, Node) application that demonstrates end-to-end reliability practices: authentication, protected content management, comprehensive testing (unit, integration, e2e), and debugging instrumentation.
 
-## Assignment Overview
+## 🚀 Features
 
-You will:
-1. Set up testing environments for both client and server
-2. Write unit tests for React components and server functions
-3. Implement integration tests for API endpoints
-4. Create end-to-end tests for critical user flows
-5. Apply debugging techniques for common MERN stack issues
+- **Authentication & Authorization**
+  - JWT-based login/registration with persisted sessions
+  - Auth context with protected routes and auto-refresh
+- **Posts Knowledge Base**
+  - Browse published posts (public)
+  - Authenticated authors can create, edit, and delete posts
+  - Server-side validation and slug generation
+- **Testing Suite**
+  - Jest + React Testing Library unit tests for utilities, hooks, and components
+  - Supertest + MongoMemoryServer integration coverage for all API endpoints
+  - Cypress end-to-end coverage for login, navigation, and posts CRUD flows
+- **Debugging & Monitoring**
+  - Structured request logging and performance metrics (Express middleware)
+  - React error boundary with recovery UI
+  - Custom utility for measuring client-side performance
 
-## Project Structure
+## 🛠️ Prerequisites
+
+- Node.js v18+
+- npm 9+
+- MongoDB (local instance or Atlas connection string)
+
+## 📂 Project Structure
 
 ```
 mern-testing/
-├── client/                 # React front-end
-│   ├── src/                # React source code
-│   │   ├── components/     # React components
-│   │   ├── tests/          # Client-side tests
-│   │   │   ├── unit/       # Unit tests
-│   │   │   └── integration/ # Integration tests
-│   │   └── App.jsx         # Main application component
-│   └── cypress/            # End-to-end tests
-├── server/                 # Express.js back-end
-│   ├── src/                # Server source code
-│   │   ├── controllers/    # Route controllers
-│   │   ├── models/         # Mongoose models
-│   │   ├── routes/         # API routes
-│   │   └── middleware/     # Custom middleware
-│   └── tests/              # Server-side tests
-│       ├── unit/           # Unit tests
-│       └── integration/    # Integration tests
-├── jest.config.js          # Jest configuration
-└── package.json            # Project dependencies
+├── client/                   # React application
+│   ├── src/
+│   │   ├── components/       # Shared UI components
+│   │   ├── context/          # Auth provider
+│   │   ├── pages/            # Routed pages
+│   │   ├── services/         # Axios API wrappers
+│   │   ├── tests/            # Unit & integration tests
+│   │   └── utils/            # Helpers & hooks
+│   └── cypress/              # End-to-end test suites
+├── server/                   # Express API
+│   ├── src/
+│   │   ├── controllers/      # Route handlers
+│   │   ├── middleware/       # Auth, validation, perf logging
+│   │   ├── models/           # Mongoose schemas
+│   │   └── routes/           # API routes
+│   └── tests/                # Jest unit & integration tests
+├── artifacts/                # Captured test run logs (unit/integration/e2e)
+├── jest.config.js            # Monorepo Jest configuration
+└── Week6-Assignment.md       # Assignment brief
 ```
 
-## Getting Started
+## ⚙️ Setup
 
-1. Accept the GitHub Classroom assignment invitation
-2. Clone your personal repository that was created by GitHub Classroom
-3. Follow the setup instructions in the `Week6-Assignment.md` file
-4. Explore the starter code and existing tests
-5. Complete the tasks outlined in the assignment
+```bash
+# 1. Install dependencies (root + client + server)
+npm run install-all
 
-## Files Included
+# 2. Create environment configuration (server/.env)
+cp server/.env.example server/.env
+# update MONGODB_URI and JWT_SECRET as needed
+```
 
-- `Week6-Assignment.md`: Detailed assignment instructions
-- Starter code for a MERN application with basic test setup:
-  - Sample React components with test files
-  - Express routes with test files
-  - Jest and testing library configurations
-  - Example tests for reference
+## ▶️ Running the App Locally
 
-## Requirements
+The development environment runs both the Express API (port 5000) and the React client (port 3000) via a single command. The client proxies API calls to the server.
 
-- Node.js (v18 or higher)
-- MongoDB (local installation or Atlas account)
-- npm or yarn
-- Basic understanding of testing concepts
+```bash
+npm run dev
+```
 
-## Testing Tools
+Key routes:
+- Client: `http://localhost:3000`
+- API health check: `http://localhost:5000/health`
+- API root overview: `http://localhost:5000/`
 
-- Jest: JavaScript testing framework
-- React Testing Library: Testing utilities for React
-- Supertest: HTTP assertions for API testing
-- Cypress/Playwright: End-to-end testing framework
-- MongoDB Memory Server: In-memory MongoDB for testing
+## 🧪 Testing Commands
 
-## Submission
+| Scope            | Command                               | Notes |
+| ---------------- | -------------------------------------- | ----- |
+| All Jest tests   | `npm test`                             | Runs unit + integration with coverage thresholds |
+| Unit tests only  | `npm run test:unit`                    | Coverage enforced (70% global) |
+| Integration only | `npm run test:integration`             | Runs API/UI integration suites without coverage gating |
+| Coverage report  | `npm run test:coverage`                | Outputs HTML reports to `coverage/` |
+| E2E (headless)   | `npm run test:e2e`                     | Requires `npm run dev` running in another shell |
+| E2E (interactive)| `npm run test:e2e:open`                | Opens Cypress runner |
 
-Your work will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
+Captured terminal output for each suite is stored in the `artifacts/` directory.
 
-1. Complete all required tests (unit, integration, and end-to-end)
-2. Achieve at least 70% code coverage for unit tests
-3. Document your testing strategy in the README.md
-4. Include screenshots of your test coverage reports
-5. Demonstrate debugging techniques in your code
+## 🌐 API Snapshot
 
-## Resources
+```
+GET  /api/posts            # Public posts feed
+POST /api/posts            # Authenticated create
+GET  /api/posts/:id        # Post details
+PUT  /api/posts/:id        # Authenticated author update
+DELETE /api/posts/:id      # Authenticated author delete
+POST /api/auth/register    # Register new user
+POST /api/auth/login       # Login and receive JWT
+GET  /api/auth/me          # Get current user profile
+```
 
-- [Jest Documentation](https://jestjs.io/docs/getting-started)
-- [React Testing Library Documentation](https://testing-library.com/docs/react-testing-library/intro/)
-- [Supertest Documentation](https://github.com/visionmedia/supertest)
-- [Cypress Documentation](https://docs.cypress.io/)
-- [MongoDB Testing Best Practices](https://www.mongodb.com/blog/post/mongodb-testing-best-practices) 
+All endpoints enforce validation and return structured error payloads.
+
+## 🧭 Frontend Routes
+
+- `/` – Home dashboard with feature overview
+- `/login` – Sign-in page using shared `LoginForm`
+- `/register` – Account creation with validation
+- `/posts` – Posts listing with delete (for authors)
+- `/posts/new` – Protected create form
+- `/posts/:id` – Read individual post
+- `/posts/:id/edit` – Protected edit form
+- `*` – 404 fallback
+
+## 🧰 Debugging Tooling
+
+- **Logging**: Console + file logging via Winston/Morgan wrappers (`server/src/utils/logger.js`)
+- **Performance**: Request timing middleware flags slow endpoints (`performanceMonitor.js`)
+- **Error Handling**: Centralized Express error handler and React error boundary
+- **Developer UX**: Helpful proxy configuration, `setAuthToken` helper, and custom hooks (`useApi`, `useLocalStorage`)
+
+## 📸 Deliverables
+
+- Up-to-date test run logs in `artifacts/`
+- Coverage reports in `coverage/client` and `coverage/server`
+- Cypress screenshots/videos automatically stored under `client/cypress/screenshots` on failure
+- Documentation of testing strategy (`TESTING_STRATEGY.md`)
+
+## ✅ Assignment Checklist
+
+- [x] Client/server connected with functional auth + posts flows
+- [x] Unit tests ≥ 90% coverage (see `npm run test:unit`)
+- [x] Integration and e2e suites exercising critical paths
+- [x] Debugging and monitoring utilities implemented
+- [x] Documentation and artifacts prepared for submission
+
+For additional details about the weekly assignment requirements, refer to [`Week6-Assignment.md`](Week6-Assignment.md). 

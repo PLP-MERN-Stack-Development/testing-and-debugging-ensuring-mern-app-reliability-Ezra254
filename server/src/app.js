@@ -30,6 +30,17 @@ if (process.env.NODE_ENV !== 'test') {
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 
+app.get('/', (req, res) => {
+  res.json({
+    message: 'MERN Reliability API',
+    endpoints: {
+      auth: '/api/auth',
+      posts: '/api/posts',
+      health: '/health',
+    },
+  });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
