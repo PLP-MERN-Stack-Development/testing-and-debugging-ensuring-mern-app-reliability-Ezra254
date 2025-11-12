@@ -1,0 +1,4 @@
+POST /api/auth/login 401 31 - 76.222 ms
+GET / 404 27 - 4.043 ms
+GET /favicon.ico 404 27 - 0.611 ms
+GET / 404 27 - 0.337 ms
